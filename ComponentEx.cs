@@ -128,5 +128,37 @@ namespace D.Unity3dTools
             if (dic.ContainsKey(key) == false) dic.Add(key, value);
             else dic[key] = value;
         }
+        /// <summary>
+        /// 根据当前鼠标位置显示RectTransform
+        /// </summary>
+        /// <param name="self">需要设定位置的对象</param>
+        /// <param name="offset">在鼠标点击位置的基础上添加的位移</param>
+        public static void SetRectPosByMousePos(this RectTransform self, Vector2 offset)
+        {
+            Vector2 pivot = self.pivot;
+            float rectW = self.rect.width;
+            float rectH = self.rect.height;
+
+            Rect screenRect = Screen.safeArea;
+            float rootW = screenRect.size.x;
+            float rootH = screenRect.size.y;
+
+            Vector2 mousePos = Input.mousePosition;
+            Vector2 tempPos = mousePos - 0.5f * screenRect.size;
+
+            Vector2 luPivot = Vector2.up;
+            Vector2 rdPivot = Vector2.right;
+            Vector2 luPoint = tempPos + offset + new Vector2((luPivot.x - pivot.x) * rectW, (luPivot.y - pivot.y) * rectH);
+            Vector2 rdPoint = tempPos + offset + new Vector2((rdPivot.x - pivot.x) * rectW, (rdPivot.y - pivot.y) * rectH);
+
+            Vector2 reviseOffset = Vector2.zero;
+            if (luPoint.x < -0.5f * rootW) reviseOffset += new Vector2(-0.5f * rootW - luPoint.x, 0);
+            if (luPoint.y > 0.5f * rootH) reviseOffset += new Vector2(0, 0.5f * rootH - luPoint.y);
+            if (rdPoint.x > 0.5f * rootW) reviseOffset += new Vector2(0.5f * rootW - rdPoint.x, 0);
+            if (rdPoint.y < -0.5f * rootH) reviseOffset += new Vector2(0, -0.5f * rootH - rdPoint.y);
+
+            tempPos += reviseOffset;
+            self.localPosition = tempPos;
+        }
     }
 }
