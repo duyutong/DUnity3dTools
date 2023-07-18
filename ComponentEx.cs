@@ -157,7 +157,7 @@ namespace D.Unity3dTools
             if (rdPoint.x > 0.5f * rootW) reviseOffset += new Vector2(0.5f * rootW - rdPoint.x, 0);
             if (rdPoint.y < -0.5f * rootH) reviseOffset += new Vector2(0, -0.5f * rootH - rdPoint.y);
 
-            tempPos += reviseOffset;
+            tempPos += reviseOffset + offset;
             self.localPosition = tempPos;
         }
     }
