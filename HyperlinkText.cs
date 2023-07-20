@@ -9,10 +9,12 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 namespace D.Unity3dTools
 {
-    public class HrefClickEvent : UnityEvent<string, Vector3> { }
+    /// <summary>
+    /// 可点击文本组件
+    /// </summary>
     public class HyperlinkText : Text, IPointerClickHandler
     {
-        public HrefClickEvent OnClick = new HrefClickEvent();
+        public UnityEvent<string, Vector3> OnClick;
         private Regex hrefRegex = new Regex(@"<a href=([^>\n\s]+)>(.*?)(</a>)", RegexOptions.Singleline);
         private Regex colorRegex = new Regex(@"<color=([^>\n\s]+)>(.*?)(</color>)", RegexOptions.Singleline);
         private List<HyperlinkInfo> hyperlinkInfos = new List<HyperlinkInfo>();

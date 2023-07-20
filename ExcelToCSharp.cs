@@ -13,13 +13,16 @@ using System;
 
 namespace D.Unity3dTools.EditorTool
 {
+    /// <summary>
+    /// 导表工具
+    /// </summary>
     public class ExcelToCSharp : EditorWindow
     {
         public static string excelPath;
         public static string jsonPath;
         public static string csharpPath;
         public static string loaderPath;
-        private static string libraryPath = Application.dataPath + "/PathLibrary.json";
+        private static string libraryPath = Application.dataPath + "/ConfigData/PathLibrary.json";
         private static Dictionary<string, Dictionary<string, string>> proTypeDic = new Dictionary<string, Dictionary<string, string>>();
         private static Dictionary<string, Dictionary<string, string>> proDesDic = new Dictionary<string, Dictionary<string, string>>();
         private static PathLibrary pathLibrary = null;
