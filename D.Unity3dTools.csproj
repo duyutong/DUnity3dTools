@@ -98,8 +98,12 @@
   <ItemGroup>
     <Compile Include="BaseConfig.cs" />
     <Compile Include="ComponentEx.cs" />
+    <Compile Include="CopyText.cs" />
     <Compile Include="CSTemplate.cs" />
+    <Compile Include="Editor\CopyTextEditor.cs" />
+    <Compile Include="Editor\FlipImageEditor.cs" />
     <Compile Include="ExcelToCSharp.cs" />
+    <Compile Include="FlipImage.cs" />
     <Compile Include="HyperlinkInfo.cs" />
     <Compile Include="HyperlinkText.cs" />
     <Compile Include="IJsonWrapper.cs" />

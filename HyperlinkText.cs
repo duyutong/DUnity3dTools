@@ -35,7 +35,6 @@ namespace D.Unity3dTools
             hyperlinkInfos.Clear();
             StringBuilder checkBuilder = new StringBuilder();
             int indexText = 0;
-            int textBuilderLength = 0;
             string noColorText = RemoveColor(_hyperlinkInfo);
             foreach (Match match in hrefRegex.Matches(noColorText))
             {
@@ -51,7 +50,6 @@ namespace D.Unity3dTools
                 };
                 hyperlinkInfos.Add(hyperlinkInfo);
                 checkBuilder.Append(match.Groups[2].Value);
-                textBuilderLength += match.Groups[2].Value.Length;
                 indexText = match.Index + match.Length;
             }
             checkBuilder.Append(noColorText.Substring(indexText, noColorText.Length - indexText));
@@ -75,12 +73,12 @@ namespace D.Unity3dTools
                         Mathf.Abs(textGen.verts[indexOfTextQuad].position.y - textGen.verts[indexOfTextQuad + 2].position.y));
                     _checkInfo.boxes.Add(new Rect(charPos, charSize));
 
-                    GameObject go = new GameObject(cha.ToString());
-                    go.AddComponent<RectTransform>();
-                    go.transform.SetParent(transform);
-                    go.GetComponent<RectTransform>().localScale = Vector3.one;
-                    go.GetComponent<RectTransform>().sizeDelta = charSize;
-                    go.GetComponent<RectTransform>().localPosition = charPos;
+                    //GameObject go = new GameObject(cha.ToString());
+                    //go.AddComponent<RectTransform>();
+                    //go.transform.SetParent(transform);
+                    //go.GetComponent<RectTransform>().localScale = Vector3.one;
+                    //go.GetComponent<RectTransform>().sizeDelta = charSize;
+                    //go.GetComponent<RectTransform>().localPosition = charPos;
 
                 }
             }
