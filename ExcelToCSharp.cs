@@ -169,6 +169,7 @@ namespace D.Unity3dTools.EditorTool
             string _loaderClassStr = CSTemplate.loaderClassStr;
             string _loaderMember = CSTemplate.loaderMember;
             string _member = "";
+            _loaderClassStr = _loaderClassStr.Replace("#libraryPath#", libraryPath);
             foreach (FileInfo fileInfo in files)
             {
                 if (!fileInfo.Name.EndsWith(".cs")) continue;
