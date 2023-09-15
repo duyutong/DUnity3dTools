@@ -229,8 +229,18 @@ namespace D.Unity3dTools
                 {
                     if (prop1.Name == prop2.Name && prop1.PropertyType == prop2.PropertyType)
                     {
-                        prop2.SetValue(destination, prop1.GetValue(source));
-                        break;
+                        if (prop1.PropertyType.IsValueType)
+                        {
+                            prop1.SetValue(destination, prop1.GetValue(source));
+                            break;
+                        }
+                        else
+                        {
+                            object retval = Activator.CreateInstance(prop1.PropertyType);
+                            retval.CopyFrom(prop1.GetValue(source));
+                            prop1.SetValue(destination, retval);
+                            break;
+                        }
                     }
                 }
             }
