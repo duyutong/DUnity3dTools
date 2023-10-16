@@ -156,7 +156,7 @@ namespace D.Unity3dTools.EditorTool
                 fileStream.Write(decBytes, 0, decBytes.Length);
                 fileStream.Flush();
                 fileStream.Close();
-                Debug.LogError("配置表类生成完毕 " + className);
+                Debug.Log("配置表类生成完毕 " + className);
             }
 
             //生成loader工具类

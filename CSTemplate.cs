@@ -67,7 +67,8 @@ public class ConfigLoader
     {
         get 
         {
-            PathLibrary pathLibrary = JsonMapper.ToObject<PathLibrary>(""File.ReadAllText(#libraryPath#)"");
+            string pathLibStr = File.ReadAllText(""#libraryPath#"");
+            PathLibrary pathLibrary = JsonMapper.ToObject<PathLibrary>(pathLibStr);
             return pathLibrary.jsonPath;
         }
     }
