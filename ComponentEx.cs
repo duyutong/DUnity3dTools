@@ -13,18 +13,6 @@ namespace D.Unity3dTools
     /// </summary>
     public static class ComponentEx
     {
-        /// <summary>
-        /// 将Texture2D转换成Sprite
-        /// </summary>
-        /// <param name="self"></param>
-        /// <returns></returns>
-        public static Sprite ToSprite(this Texture2D self)
-        {
-            Rect rect = new Rect(0, 0, self.width, self.height);
-            Vector2 pivot = Vector2.one * 0.5f;
-            return Sprite.Create(self, rect, pivot);
-        }
-
         #region EventTrigger
         /// <summary>
         /// 通过代码添加EventTrigger事件（只能做unity已经定义的事件）
@@ -135,7 +123,80 @@ namespace D.Unity3dTools
         }
         #endregion
 
+        #region Texture
+        /// <summary>
+        /// 将Texture2D转换成Sprite
+        /// </summary>
+        /// <param name="self"></param>
+        /// <returns></returns>
+        public static Sprite ToSprite(this Texture2D self)
+        {
+            Rect rect = new Rect(0, 0, self.width, self.height);
+            Vector2 pivot = Vector2.one * 0.5f;
+            return Sprite.Create(self, rect, pivot);
+        }
+        /// <summary>
+        /// 捕获指定区域的屏幕截图
+        /// </summary>
+        /// <param name="captureArea">要捕获的区域</param>
+        /// <param name="captureCamera">用于截图的相机</param>
+        /// <param name="bytes">保存截图的字节数组</param>
+        public static void CaptureScreenshot(Rect captureArea, Camera captureCamera,out byte[] bytes) 
+        {
+            // 保存原相机设置
+            Rect originalRect = captureCamera.rect;
+            RenderTexture originalRT = captureCamera.targetTexture;
+
+            // 设置相机和RenderTexture用于截图
+            captureCamera.rect = captureArea;
+            RenderTexture rt = new RenderTexture((int)captureArea.width, (int)captureArea.height, 24);
+            captureCamera.targetTexture = rt;
+
+            // 创建一个2D纹理，读取截图像素
+            Texture2D screenShot = new Texture2D((int)captureArea.width, (int)captureArea.height, TextureFormat.RGB24, false);
+            captureCamera.Render();
+            RenderTexture.active = rt;
+            Vector2 startPos = 0.5f * new Vector2(Screen.width - captureArea.width, Screen.height - captureArea.height);
+            screenShot.ReadPixels(new Rect(startPos.x, startPos.y, captureArea.x, captureArea.y), 0, 0);
+            captureCamera.targetTexture = null;
+            RenderTexture.active = null;
+            UnityEngine.Object.Destroy(rt);
+
+            // 恢复相机原设置
+            captureCamera.rect = originalRect;
+            captureCamera.targetTexture = originalRT;
+
+            // 将Texture2D转换为字节数组
+           bytes = screenShot.EncodeToPNG();
+        }
+        #endregion
+
         #region Collection
+        /// <summary>
+        /// 去除列表中的重复对象，支持单一判断条件
+        /// </summary>
+        /// <typeparam name="T1"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <param name="ts"></param>
+        /// <param name="checkFunc"></param>
+        public static void RemoveDuplicates<T1, T2>(this IList<T1> ts, Func<T1, T2> checkFunc)
+        {
+            IList<T2> temp = new List<T2>();
+            List<int> indexList = new List<int>();
+
+            for (int i = 0; i < ts.Count; i++)
+            {
+                T1 t1 = ts[i];
+                T2 t2 = checkFunc(t1);
+                if (temp.Contains(t2)) indexList.Add(i);
+                else temp.Add(t2);
+            }
+
+            for (int i = indexList.Count; i > 0; --i)
+            {
+                ts.RemoveAt(indexList[i]);
+            }
+        }
         /// <summary>
         /// 查找列表中符合条件的item数量
         /// </summary>
@@ -223,6 +284,32 @@ namespace D.Unity3dTools
             PropertyInfo[] properties1 = type1.GetProperties(isPublicOnly ? flags_Public : flags_all);
             PropertyInfo[] properties2 = type2.GetProperties(isPublicOnly ? flags_Public : flags_all);
 
+            FieldInfo[] fieldInfos1 = type1.GetFields(isPublicOnly ? flags_Public : flags_all);
+            FieldInfo[] fieldInfos2 = type2.GetFields(isPublicOnly ? flags_Public : flags_all);
+
+
+            foreach (FieldInfo field1 in fieldInfos1)
+            {
+                foreach (FieldInfo field2 in fieldInfos2)
+                {
+                    if (field1.Name == field2.Name && field1.FieldType == field2.FieldType)
+                    {
+                        if (field1.FieldType.IsValueType || field1.FieldType.Equals(typeof(string)))
+                        {
+                            field1.SetValue(destination, field1.GetValue(source));
+                            break;
+                        }
+                        else
+                        {
+                            object retval = Activator.CreateInstance(field1.FieldType);
+                            retval.CopyFrom(field1.GetValue(source));
+                            field1.SetValue(destination, retval);
+                            break;
+                        }
+                    }
+                }
+            }
+
             foreach (PropertyInfo prop1 in properties1)
             {
                 foreach (PropertyInfo prop2 in properties2)
@@ -246,5 +333,68 @@ namespace D.Unity3dTools
             }
         }
         #endregion
+
+        #region TimeCountdown
+        public struct CountdownData
+        {
+            public int Days;
+            public int Hours;
+            public int Minutes;
+        }
+        public static CountdownData CalculateCountdown(long timestampMillis)
+        {
+            DateTime currentTime = DateTime.Now;
+            DateTime targetTime = DateTimeOffset.FromUnixTimeMilliseconds(timestampMillis).LocalDateTime;
+
+            TimeSpan timeLeft = targetTime - currentTime;
+
+            CountdownData countdownData = new CountdownData
+            {
+                Days = timeLeft.Days,
+                Hours = timeLeft.Hours % 24,
+                Minutes = timeLeft.Minutes % 60,
+            };
+
+            return countdownData;
+        }
+        #endregion
+
+#if Has_DG_Tweening
+        #region DoTween
+        public static void DoFadeIn(this Transform trans, float duration = 0.2f, float targetAlpha = 1)
+        {
+            trans.gameObject.SetActive(true);
+            CanvasGroup canvasGroup = trans.GetOrAddComponent<CanvasGroup>();
+            canvasGroup.blocksRaycasts = false;
+            // 设置动画对象id
+            string tweenId = canvasGroup.GetInstanceID() + "_DoFade";
+            DOTween.Kill(tweenId);
+            // 使用Tween.To来实现渐变
+            canvasGroup.alpha = 0;
+            Tweener tweener = DOTween.To(() => canvasGroup.alpha, x => canvasGroup.alpha = x, targetAlpha, duration).SetId(tweenId)
+                .SetEase(Ease.Linear)
+                 .OnComplete(() =>
+                 {
+                     canvasGroup.blocksRaycasts = true;
+                 });
+        }
+        public static void DoFadeOut(this Transform trans, float duration = 0.2f, float targetAlpha = 0)
+        {
+            trans.gameObject.SetActive(true);
+            CanvasGroup canvasGroup = trans.gameObject.GetOrAddComponent<CanvasGroup>();
+            canvasGroup.blocksRaycasts = false;
+            // 设置动画对象id
+            string tweenId = canvasGroup.GetInstanceID() + "_DoFade";
+            DOTween.Kill(tweenId);
+            // 使用Tween.To来实现渐变
+            Tweener tweener = DOTween.To(() => canvasGroup.alpha, x => canvasGroup.alpha = x, targetAlpha, duration).SetId(tweenId)
+                .SetEase(Ease.Linear)
+                .OnComplete(() =>
+                {
+                    trans.gameObject.SetActive(false);
+                });
+        }
+        #endregion
+#endif
     }
 }
