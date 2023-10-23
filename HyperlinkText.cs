@@ -64,10 +64,10 @@ namespace D.Unity3dTools
                 {
                     char cha = checkTxt[charIndex];
                     int indexOfTextQuad = charIndex * 4;
+                    if (cha == ' ') continue;
+                    if (textGen.verts.Count <= indexOfTextQuad) continue;
                     Vector3 charPos = (textGen.verts[indexOfTextQuad].position +
-                           textGen.verts[indexOfTextQuad + 1].position +
-                           textGen.verts[indexOfTextQuad + 2].position +
-                           textGen.verts[indexOfTextQuad + 3].position) / 4f;
+                           textGen.verts[indexOfTextQuad + 3].position) / 2f;
                     charPos /= canvas.scaleFactor;//适应不同分辨率的屏幕
                     Vector2 charSize = new Vector2(Mathf.Abs(textGen.verts[indexOfTextQuad].position.x - textGen.verts[indexOfTextQuad + 2].position.x),
                         Mathf.Abs(textGen.verts[indexOfTextQuad].position.y - textGen.verts[indexOfTextQuad + 2].position.y));
