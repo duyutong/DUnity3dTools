@@ -26,7 +26,7 @@ namespace D.Unity3dTools.EditorTool
         private static Dictionary<string, Dictionary<string, string>> proTypeDic = new Dictionary<string, Dictionary<string, string>>();
         private static Dictionary<string, Dictionary<string, string>> proDesDic = new Dictionary<string, Dictionary<string, string>>();
         private static PathLibrary pathLibrary = null;
-        [MenuItem("Tool/ExcelToJson")]
+        [MenuItem("Tools/Excel/ExcelToJson")]
         private static void ToJson()
         {
             if (!File.Exists(libraryPath)) { ShowInitWindow(); return; }
@@ -109,7 +109,7 @@ namespace D.Unity3dTools.EditorTool
             loaderPath = pathLibrary.loaderPath;
         }
 
-        [MenuItem("Tool/JsonToCsharp")]
+        [MenuItem("Tools/Excel/JsonToCsharp")]
         private static void ToCSharp()
         {
             ToJson();
@@ -190,7 +190,7 @@ namespace D.Unity3dTools.EditorTool
             fileStream.Flush();
             fileStream.Close();
         }
-        [MenuItem("Tool/InitPath")]
+        [MenuItem("Tools/Excel/InitPath")]
         private static void ShowInitWindow()
         {
             if (pathLibrary == null && File.Exists(libraryPath)) InitPathLibrary();
