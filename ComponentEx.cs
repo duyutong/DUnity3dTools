@@ -294,15 +294,19 @@ namespace D.Unity3dTools
                 {
                     if (field1.Name == field2.Name && field1.FieldType == field2.FieldType)
                     {
-                        if (field1.FieldType.IsValueType || field1.FieldType.Equals(typeof(string)))
+                        if (field2.FieldType.IsValueType || field2.FieldType.Equals(typeof(string)))
                         {
-                            field1.SetValue(destination, field1.GetValue(source));
+                            field1.SetValue(destination, field2.GetValue(source));
                             break;
+                        }
+                        else if (IsListType(field2.FieldType))
+                        {
+                            field1.SetValue(destination, field2.GetValue(source));
                         }
                         else
                         {
                             object retval = Activator.CreateInstance(field1.FieldType);
-                            retval.CopyFrom(field1.GetValue(source));
+                            retval.CopyFrom(field2.GetValue(source));
                             field1.SetValue(destination, retval);
                             break;
                         }
@@ -318,19 +322,32 @@ namespace D.Unity3dTools
                     {
                         if (prop1.PropertyType.IsValueType)
                         {
-                            prop1.SetValue(destination, prop1.GetValue(source));
+                            prop1.SetValue(destination, prop2.GetValue(source));
                             break;
                         }
                         else
                         {
                             object retval = Activator.CreateInstance(prop1.PropertyType);
-                            retval.CopyFrom(prop1.GetValue(source));
+                            retval.CopyFrom(prop2.GetValue(source));
                             prop1.SetValue(destination, retval);
                             break;
                         }
                     }
                 }
             }
+        }
+        /// <summary>
+        /// 判断对象是否是一个列表
+        /// </summary>
+        /// <param name="fieldType"></param>
+        /// <returns></returns>
+        public static bool IsListType(Type fieldType)
+        {
+            if (fieldType.IsGenericType && fieldType.GetGenericTypeDefinition() == typeof(List<>))
+            {
+                return true;
+            }
+            return false;
         }
         #endregion
 
